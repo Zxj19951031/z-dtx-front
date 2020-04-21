@@ -160,7 +160,6 @@
             },
             handleDrawerAddOrEdit() {
                 this.formAddOrEdit = Object.assign(this.$refs[this.dbType[this.formAddOrEdit.dbType - 1].label].form, this.formAddOrEdit);
-                console.log(this.formAddOrEdit)
                 let url = '';
                 if (this.drawer.type === 'add') {
                     url = 'db/addOne'

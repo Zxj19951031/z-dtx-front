@@ -11,7 +11,7 @@ export default {
             });
         } else {
             ElementUI.Message({
-                message: msg,
+                message: 'Code:' + code + '，Message:' + response.data.data,
                 type: "error"
             })
         }

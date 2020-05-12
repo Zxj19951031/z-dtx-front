@@ -25,8 +25,10 @@
             return {
                 navList: [
                     {name: '/components/database/DatabaseManager', navItem: '数据源管理', icon: 'el-icon-coin'},
-                    {name: '/components/database/JobManager', navItem: '任 务 管 理', icon: 'el-icon-tickets'},
                     {name: '/components/rule/Rule', navItem: '规 则 管 理', icon: 'el-icon-timer'},
+                    {name: '/components/data/Transport', navItem: '传 输 管 理', icon: 'el-icon-cpu'},
+                    {name: '/components/Test', navItem: '数 据 转 换', icon: 'el-icon-refresh'},
+                    {name: '/components/data/Clean', navItem: '数 据 清 洗', icon: 'el-icon-help'},
                 ]
             }
         },

@@ -1,5 +1,5 @@
 <template>
-    <el-container direction="vertical">
+    <div>
         <el-row>
             <el-col :span="16">
                 <el-form :inline="true" :model="formSearch" class="demo-form-inline" ref="formSearch">
@@ -7,7 +7,8 @@
                         <el-input v-model="formSearch.name" placeholder="请输入"></el-input>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" icon="el-icon-search" @click="flushTable(formSearch)">查询</el-button>
+                        <el-button type="primary" icon="el-icon-search" @click="flushTable(formSearch)">查询
+                        </el-button>
                     </el-form-item>
                     <el-form-item>
                         <el-button @click="onSearchFormClear('formSearch')">清空</el-button>
@@ -416,7 +417,7 @@
                 </el-footer>
             </el-container>
         </el-drawer>
-    </el-container>
+    </div>
 </template>
 
 <script>

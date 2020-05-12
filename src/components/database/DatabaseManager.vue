@@ -1,5 +1,5 @@
 <template>
-    <el-container direction="vertical">
+    <div>
         <el-row>
             <el-col :span="16">
                 <el-form :inline="true" :model="formSearch" class="demo-form-inline" ref="formSearch">
@@ -15,7 +15,8 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="flushTable(formSearch)" icon="el-icon-search">查询</el-button>
+                        <el-button type="primary" @click="flushTable(formSearch)" icon="el-icon-search">查询
+                        </el-button>
                     </el-form-item>
                     <el-form-item>
                         <el-button @click="onSearchFormClear('formSearch')">清空</el-button>
@@ -83,6 +84,8 @@
                 </el-main>
                 <el-footer style="text-align: right; padding-top: 10px" justify="center">
                     <el-row>
+                        <el-button :loading="loading" @click="checkConnection">测试连通性
+                        </el-button>
                         <el-button type="primary" @click="handleDrawerAddOrEdit">
                             <span v-if="drawer.type==='add'">保存新增</span>
                             <span v-if="drawer.type==='edit'">保存编辑</span>
@@ -91,7 +94,7 @@
                 </el-footer>
             </el-container>
         </el-drawer>
-    </el-container>
+    </div>
 </template>
 
 <script>
@@ -132,7 +135,9 @@
                 formAddOrEdit: {
                     dbName: '',
                     dbType: 1
-                }
+                },
+                loading: false,
+                disable: false
             }
         },
         name: "DatabaseManager",
@@ -198,6 +203,14 @@
                 this.$dbApi.post('db/deleteBatch', params, response => {
                     this.$respHandler.handleResponse(response)
                     this.flushTable(this.formSearch)
+                })
+            },
+            checkConnection() {
+                this.formAddOrEdit = Object.assign(this.$refs[this.dbType[this.formAddOrEdit.dbType - 1].label].form, this.formAddOrEdit);
+                this.loading = true;
+                this.$dbApi.post('db/connection/check', this.formAddOrEdit, response => {
+                    this.$respHandler.handleResponse(response)
+                    this.loading = false;
                 })
             }
         }

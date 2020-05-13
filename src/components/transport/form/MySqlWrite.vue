@@ -1,13 +1,21 @@
 <template>
     <el-form v-model="formData" label-width="100px">
         <el-form-item label="选择库">
-            <el-select v-model="formData.schema" placeholder="请选择（Schema）">
-
+            <el-select v-model="formData.schema" placeholder="请选择（Schema）" @change="onSchemaChange"
+                       class="transport_edit_select">
+                <el-option v-for="(item,index) in selectData.catalog"
+                           :key="index"
+                           :label="item"
+                           :value="item"></el-option>
             </el-select>
         </el-form-item>
         <el-form-item label="选择表">
-            <el-select v-model="formData.table" placeholder="请选择（Table）">
-
+            <el-select v-model="formData.table" placeholder="请选择（Table）" @change="onTableChange"
+                       class="transport_edit_select">
+                <el-option v-for="(item,index) in selectData.table"
+                           :key="index"
+                           :label="item"
+                           :value="item"></el-option>
             </el-select>
         </el-form-item>
         <el-form-item label="选择写入方式">
@@ -32,10 +40,44 @@
         name: "MySqlWrite",
         data() {
             return {
+                selectData: {
+                    target_id: '',
+                    catalog: [],
+                    table: [],
+                },
                 formData: {
                     schema: '',
                     table: '',
-                    insertMode:''
+                    insertMode: 'insert',
+                    preSql: '',
+                    postSql: '',
+                }
+            }
+        },
+        methods: {
+            onSchemaChange(item) {
+                if (item !== '') {
+                    this.$dbApi.post(['db', 1, this.selectData.target_id, 'table', 'get'].join('/'), {catalog: item}, response => {
+                        if (response.data.code === 200) {
+                            this.selectData.table = response.data.data
+                        } else {
+                            this.$respHandler.handleResponse(response)
+                        }
+                    })
+                }
+            },
+            onTableChange(item) {
+                if (item !== '') {
+                    this.$dbApi.post(['db', 1, this.selectData.target_id, 'column', 'get'].join('/'), {
+                        catalog: this.formData.schema,
+                        table: this.formData.table
+                    }, response => {
+                        if (response.data.code === 200) {
+                            this.$emit('receiveChildren', response.data.data)
+                        } else {
+                            this.$respHandler.handleResponse(response)
+                        }
+                    })
                 }
             }
         }

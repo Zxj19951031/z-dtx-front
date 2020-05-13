@@ -4,8 +4,9 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import router from './router'
 import dbApi from './api/dbApi'
-import ruleApi from "@/api/ruleApi";
-import respHandler from "@/response/respHandler";
+import ruleApi from "@/api/ruleApi"
+import respHandler from "@/response/respHandler"
+import './assets/index.less'
 
 Vue.config.productionTip = false
 Vue.use(ElementUI)

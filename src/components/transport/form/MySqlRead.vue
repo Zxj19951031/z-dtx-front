@@ -1,5 +1,5 @@
 <template>
-  <el-form v-model="reader" label-width="100px">
+  <el-form v-model="reader" label-width="160px">
     <el-form-item label="选择库">
       <el-select
         v-model="formData.schema"
@@ -51,6 +51,21 @@
     <el-form-item label="结束处理">
       <el-input v-model="reader.parameter.postSql" placeholder="请输入结束处理Sql"></el-input>
     </el-form-item>
+    <el-form-item label="切分主键">
+      <el-input v-model="reader.parameter.primaryKey" placeholder="请输入切分主键字段" style="width:300px"></el-input>
+    </el-form-item>
+    <el-row>
+      <el-col :span="8">
+        <el-form-item label="查询超时时间(秒）">
+          <el-input-number v-model="reader.parameter.queryTimeout" size="mini"></el-input-number>
+        </el-form-item>
+      </el-col>
+      <el-col :span="8">
+        <el-form-item label="登录超时时间(秒）">
+          <el-input-number v-model="reader.parameter.loginTimeout" size="mini"></el-input-number>
+        </el-form-item>
+      </el-col>
+    </el-row>
   </el-form>
 </template>
 

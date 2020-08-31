@@ -1,5 +1,5 @@
 <template>
-  <el-form v-model="formData" label-width="100px">
+  <el-form v-model="formData" label-width="160px">
     <el-form-item label="选择库">
       <el-select
         v-model="formData.schema"
@@ -25,7 +25,7 @@
         <el-option
           v-for="(item,index) in selectData.table"
           :key="index"
-          :label="item"
+          :label="item.split('.')[1]"
           :value="item"
         ></el-option>
       </el-select>
@@ -43,6 +43,23 @@
     <el-form-item label="结束处理">
       <el-input v-model="writer.parameter.postSql" placeholder="请输入Sql"></el-input>
     </el-form-item>
+    <el-row>
+      <el-col :span="8">
+        <el-form-item label="查询超时时间(秒）">
+          <el-input-number v-model="writer.parameter.queryTimeout" size="mini"></el-input-number>
+        </el-form-item>
+      </el-col>
+      <el-col :span="8">
+        <el-form-item label="登录超时时间(秒）">
+          <el-input-number v-model="writer.parameter.loginTimeout" size="mini"></el-input-number>
+        </el-form-item>
+      </el-col>
+      <el-col :span="8">
+        <el-form-item label="最大缓冲记录数(条）">
+          <el-input-number v-model="writer.parameter.bufferSize" size="mini"></el-input-number>
+        </el-form-item>
+      </el-col>
+    </el-row>
   </el-form>
 </template>
 

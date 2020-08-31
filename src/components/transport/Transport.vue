@@ -32,7 +32,7 @@
             <el-button type="text" size="small">
               <i class="el-icon-tickets"></i>查看实例
             </el-button>
-            <el-button type="text" size="small">
+            <el-button type="text" size="small" @click="onRegister(scope.row)">
               <i class="el-icon-video-play"></i>运行
             </el-button>
             <el-button type="text" size="small">
@@ -65,13 +65,7 @@ export default {
         pageSize: 10,
         pageNum: 0,
       },
-      tableData: [
-        {
-          name: "MySql至MySql传输",
-          createTime: "2020-04-22 00:00:00",
-          updateTime: "2020-04-22 00:00:00",
-        },
-      ],
+      tableData: [],
       pageParam: {
         total: 0,
         pageSize: 10,
@@ -80,11 +74,18 @@ export default {
     };
   },
   created() {
-    console.log("111");
+    this.flushTable(this.formSearch);
   },
   methods: {
     flushTable(params) {
-      console.log(params);
+      this.$dbApi.get(
+        "transport/page/list",
+        params == null ? {} : params,
+        (response) => {
+          this.tableData = response.data.data.list;
+          this.pageParam.total = response.data.data.total;
+        }
+      );
     },
     onSearchFormClear(ref) {
       this.$refs[ref].resetFields();
@@ -102,8 +103,15 @@ export default {
       this.$router.push("/components/transport/AddOrEditTransport");
     },
     onSetting(row) {
-      console.log(row);
-      this.$router.push("/components/transport/AddOrEditTransport");
+      this.$router.push({
+        name: "AddOrEditTransport",
+        query: { id: row.id },
+      });
+    },
+    onRegister(row) {
+      this.$dbApi.get("transport/register", { id: row.id }, (response) => {
+        this.$respHandler.handleResponse(response);
+      });
     },
   },
 };

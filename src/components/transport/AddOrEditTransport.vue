@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form v-model="job" label-width="100px" label-position="left" pre="job">
+    <el-form v-model="job" label-width="160px" label-position="left" pre="job">
       <el-timeline style="padding-inline-start:0">
         <el-timeline-item>
           <el-divider content-position="left">基本信息</el-divider>
@@ -97,6 +97,26 @@
           </el-row>
         </el-timeline-item>
         <el-timeline-item>
+          <el-divider content-position="left">高级配置</el-divider>
+          <el-row>
+            <el-col :span="8">
+              <el-form-item label="并发任务数量（个）">
+                <el-input-number v-model="job.setting.speed.channel" size="mini"></el-input-number>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="日志汇报间隔（毫秒）">
+                <el-input-number v-model="job.setting.report.interval" size="mini"></el-input-number>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="最大缓冲记录数（条）">
+                <el-input-number v-model="job.tunnel.bufferSize" size="mini"></el-input-number>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-timeline-item>
+        <el-timeline-item>
           <el-divider content-position="left">调度规则</el-divider>
           <el-form-item label="调度器">
             <el-select
@@ -118,8 +138,8 @@
           <el-row style="text-align: right;">
             <el-button @click="onCancel">取消</el-button>
             <el-button type="primary" @click="onSave">
-              <span>保存新增</span>
-              <span>保存编辑</span>
+              <span v-if="this.$route.query.id==null">保存新增</span>
+              <span v-if="this.$route.query.id!=null">保存编辑</span>
             </el-button>
           </el-row>
         </el-timeline-item>
@@ -137,6 +157,31 @@ export default {
   name: "AddOrEditTransport",
   components: { MySqlWrite, MySqlRead },
   created() {
+    if (this.$route.query.id != null) {
+      this.$dbApi.get(
+        "transport/find",
+        { id: this.$route.query.id },
+        (response) => {
+          let metadata = JSON.parse(response.data.data.metadata);
+          this.formData = metadata.formData;
+          this.onSourceSelectChange(this.formData.sourceDb);
+          this.onTargetSelectChange(this.formData.targetDb);
+          this.job = metadata.job;
+          this.$nextTick(() => {
+            this.$refs["sourceDetail"].formData = this.formData.reader;
+            this.$refs["sourceDetail"].reader = this.job.content.reader;
+            this.$refs["sourceDetail"].onSchemaChange(
+              this.formData.reader.schema
+            );
+            this.$refs["targetDetail"].formData = this.formData.writer;
+            this.$refs["targetDetail"].writer = this.job.content.writer;
+            this.$refs["targetDetail"].onSchemaChange(
+              this.formData.reader.schema
+            );
+          });
+        }
+      );
+    }
     this.$dbApi.get("db/listPage", { pageNum: -1 }, (response) => {
       this.dbList = response.data.data.list;
     });
@@ -292,16 +337,75 @@ export default {
     onProgressCellClick(item) {
       item.value = Math.abs(item.value - 100);
     },
+    //保存配置
     onSave() {
+      //合并读取的配置
       this.job.content.reader = Object.assign(
         this.$refs["sourceDetail"].reader,
         this.job.content.reader
       );
+      //合并写入的配置
       this.job.content.writer = Object.assign(
         this.$refs["targetDetail"].writer,
         this.job.content.writer
       );
-      console.log(JSON.stringify(this.job));
+      //构建列表信息
+      this.job.content.reader.parameter.columns = [];
+      this.job.content.writer.parameter.columns = [];
+      for (let i = 0; i < this.formData.line.length; i++) {
+        if (this.formData.line[i].value === 100) {
+          this.job.content.reader.parameter.columns.push(
+            this.formData.source_col[i].name
+          );
+          this.job.content.writer.parameter.columns.push(
+            this.formData.target_col[i].name
+          );
+        }
+      }
+      //保存子页面的表单数据
+      this.formData.reader = this.$refs["sourceDetail"].formData;
+      this.formData.writer = this.$refs["targetDetail"].formData;
+      //发送请求
+      if (this.$route.query.id != null) {
+        this.$dbApi.post(
+          "transport/modify",
+          {
+            id: this.$route.query.id,
+            name: this.formData.name,
+            source: this.formData.sourceDb,
+            target: this.formData.targetDb,
+            ruleId: this.formData.rule_id,
+            config: JSON.stringify(this.job),
+            metadata: JSON.stringify({
+              formData: this.formData,
+              job: this.job,
+            }),
+          },
+          (response) => {
+            this.$respHandler.handleResponse(response);
+            this.$router.push("/components/data/Transport");
+          }
+        );
+      } else {
+        this.$dbApi.post(
+          "transport/add",
+          {
+            name: this.formData.name,
+            source: this.formData.sourceDb,
+            target: this.formData.targetDb,
+            ruleId: this.formData.rule_id,
+            config: JSON.stringify(this.job),
+            metadata: JSON.stringify({
+              formData: this.formData,
+              job: this.job,
+            }),
+          },
+          (response) => {
+            this.$respHandler.handleResponse(response);
+            this.$router.push("/components/data/Transport");
+          }
+        );
+      }
     },
     onCancel() {
       this.$router.push("/components/data/Transport");

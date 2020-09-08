@@ -9,10 +9,10 @@
           <el-form-item label="数据源类型" prop="dbType">
             <el-select v-model="formSearch.dbType" placeholder="请选择">
               <el-option
-                v-for="item in dbType"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
+                  v-for="item in dbType"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
               ></el-option>
             </el-select>
           </el-form-item>
@@ -30,12 +30,12 @@
     </el-row>
     <el-row>
       <el-table :data="tableData" style="width: 100%">
-        <el-table-column type="index" label="序号" width="50" />
-        <el-table-column prop="dbName" label="数据源名称" width="300" />
-        <el-table-column prop="dbTypeStr" label="数据源类型" width="180" />
-        <el-table-column prop="host" label="主机地址" />
-        <el-table-column prop="createTime" label="创建时间" />
-        <el-table-column prop="updateTime" label="修改时间" />
+        <el-table-column type="index" label="序号" width="50"/>
+        <el-table-column prop="dbName" label="数据源名称" width="300"/>
+        <el-table-column prop="dbTypeStr" label="数据源类型" width="180"/>
+        <el-table-column prop="host" label="主机地址"/>
+        <el-table-column prop="createTime" label="创建时间"/>
+        <el-table-column prop="updateTime" label="修改时间"/>
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button type="text" size="small" @click="handleDrawerOpen(scope.row)">
@@ -49,30 +49,30 @@
       </el-table>
       <el-row type="flex" justify="center">
         <el-pagination
-          @size-change="onPageSizeChange"
-          @current-change="onPageNumChange"
-          :page-sizes="pageParam.pageSizes"
-          :page-size="pageParam.pageSize"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="pageParam.total"
+            @size-change="onPageSizeChange"
+            @current-change="onPageNumChange"
+            :page-sizes="pageParam.pageSizes"
+            :page-size="pageParam.pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="pageParam.total"
         ></el-pagination>
       </el-row>
     </el-row>
     <el-drawer
-      :visible.sync="drawer.visible"
-      :direction="drawer.direction"
-      :before-close="beforeDrawerClose"
-      @closed="handleDrawerClose('drawerForm')"
-      :modal="drawer.model"
-      ref="drawer"
+        :visible.sync="drawer.visible"
+        :direction="drawer.direction"
+        :before-close="beforeDrawerClose"
+        @closed="handleDrawerClose('drawerForm')"
+        :modal="drawer.model"
+        ref="drawer"
     >
       <el-container direction="vertical">
         <el-main>
           <el-form
-            :model="formAddOrEdit"
-            label-width="100px"
-            style="margin-right: 20px"
-            ref="drawerForm"
+              :model="formAddOrEdit"
+              label-width="100px"
+              style="margin-right: 20px"
+              ref="drawerForm"
           >
             <el-form-item label="数据源名称" prop="dbName">
               <el-input placeholder="请输入数据源名称" v-model="formAddOrEdit.dbName"></el-input>
@@ -80,10 +80,10 @@
             <el-form-item label="数据源类型" placeholder="请选择" prop="dbType">
               <el-select v-model="formAddOrEdit.dbType">
                 <el-option
-                  v-for="item in dbType"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
+                    v-for="item in dbType"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
                 ></el-option>
               </el-select>
             </el-form-item>
@@ -108,7 +108,7 @@
 import MySqlForm from "@/components/database/form/MySqlForm";
 
 export default {
-  components: { MySqlForm },
+  components: {MySqlForm},
   created() {
     this.flushTable(this.formSearch);
   },
@@ -154,12 +154,12 @@ export default {
   methods: {
     flushTable(params) {
       this.$dbApi.get(
-        "db/listPage",
-        params == null ? {} : params,
-        (response) => {
-          this.tableData = response.data.data.list;
-          this.pageParam.total = response.data.data.total;
-        }
+          "db/listPage",
+          params == null ? {} : params,
+          (response) => {
+            this.tableData = response.data.data.list;
+            this.pageParam.total = response.data.data.total;
+          }
       );
     },
     onPageSizeChange(pageSize) {
@@ -179,8 +179,8 @@ export default {
     },
     handleDrawerAddOrEdit() {
       this.formAddOrEdit = Object.assign(
-        this.$refs[this.dbType[this.formAddOrEdit.dbType - 1].label].form,
-        this.formAddOrEdit
+          this.$refs[this.dbType[this.formAddOrEdit.dbType - 1].label].form,
+          this.formAddOrEdit
       );
       let url = "";
       if (this.drawer.type === "add") {
@@ -204,14 +204,14 @@ export default {
       } else {
         this.drawer.type = "edit";
         this.$dbApi.get(
-          "db/find",
-          { id: row.id, dbType: row.dbType },
-          (response) => {
-            this.formAddOrEdit.dbName = response.data.data.dbName;
-            this.formAddOrEdit.dbType = row.dbType;
-            this.$refs[this.dbType[this.formAddOrEdit.dbType - 1].label].form =
-              response.data.data;
-          }
+            "db/find",
+            {id: row.id, dbType: row.dbType},
+            (response) => {
+              this.formAddOrEdit.dbName = response.data.data.dbName;
+              this.formAddOrEdit.dbType = row.dbType;
+              this.$refs[this.dbType[this.formAddOrEdit.dbType - 1].label].form =
+                  response.data.data;
+            }
         );
       }
     },
@@ -231,17 +231,17 @@ export default {
     },
     checkConnection() {
       this.formAddOrEdit = Object.assign(
-        this.$refs[this.dbType[this.formAddOrEdit.dbType - 1].label].form,
-        this.formAddOrEdit
+          this.$refs[this.dbType[this.formAddOrEdit.dbType - 1].label].form,
+          this.formAddOrEdit
       );
       this.loading = true;
       this.$dbApi.post(
-        "db/connection/check",
-        this.formAddOrEdit,
-        (response) => {
-          this.$respHandler.handleResponse(response);
-          this.loading = false;
-        }
+          "db/connection/check",
+          this.formAddOrEdit,
+          (response) => {
+            this.$respHandler.handleResponse(response);
+            this.loading = false;
+          }
       );
     },
   },

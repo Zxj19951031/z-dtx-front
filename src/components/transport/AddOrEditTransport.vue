@@ -12,47 +12,47 @@
           <el-divider content-position="left">源头表</el-divider>
           <el-form-item label="数据源">
             <el-select
-              v-model="formData.sourceDb"
-              placeholder="请选择数据源"
-              @change="onSourceSelectChange"
-              ref="source"
-              class="transport_edit_select"
+                v-model="formData.sourceDb"
+                placeholder="请选择数据源"
+                @change="onSourceSelectChange"
+                ref="source"
+                class="transport_edit_select"
             >
               <el-option
-                v-for="(item,index) in dbList"
-                :key="index"
-                :label="item.dbName"
-                :value="item.dbType+'-'+item.id"
+                  v-for="(item,index) in dbList"
+                  :key="index"
+                  :label="item.dbName"
+                  :value="item.dbType+'-'+item.id"
               ></el-option>
             </el-select>
           </el-form-item>
           <MySqlRead
-            v-if="formData.sourceDb.split('-')[0]==='1'"
-            ref="sourceDetail"
-            @receiveChildren="receiveSourceCol"
+              v-if="formData.sourceDb.split('-')[0]==='1'"
+              ref="sourceDetail"
+              @receiveChildren="receiveSourceCol"
           ></MySqlRead>
         </el-timeline-item>
         <el-timeline-item>
           <el-divider content-position="left">目标表</el-divider>
           <el-form-item label="数据源">
             <el-select
-              v-model="formData.targetDb"
-              placeholder="请选择数据源"
-              @change="onTargetSelectChange"
-              class="transport_edit_select"
+                v-model="formData.targetDb"
+                placeholder="请选择数据源"
+                @change="onTargetSelectChange"
+                class="transport_edit_select"
             >
               <el-option
-                v-for="(item,index) in dbList"
-                :key="index"
-                :label="item.dbName"
-                :value="item.dbType+'-'+item.id"
+                  v-for="(item,index) in dbList"
+                  :key="index"
+                  :label="item.dbName"
+                  :value="item.dbType+'-'+item.id"
               ></el-option>
             </el-select>
           </el-form-item>
           <MySqlWrite
-            v-if="formData.targetDb.split('-')[0]==='1'"
-            ref="targetDetail"
-            @receiveChildren="receiveTargetCol"
+              v-if="formData.targetDb.split('-')[0]==='1'"
+              ref="targetDetail"
+              @receiveChildren="receiveTargetCol"
           ></MySqlWrite>
         </el-timeline-item>
         <el-timeline-item>
@@ -60,21 +60,21 @@
           <el-row>
             <el-col :span="10">
               <el-table
-                :data="formData.source_col"
-                id="source_col_tb"
-                :header-cell-style="()=>{return 'text-align: center'}"
-                :cell-style=" ()=>{return 'text-align: center'}"
+                  :data="formData.source_col"
+                  id="source_col_tb"
+                  :header-cell-style="()=>{return 'text-align: center'}"
+                  :cell-style=" ()=>{return 'text-align: center'}"
               >
-                <el-table-column prop="name" label="字段名称" />
-                <el-table-column prop="type" label="字段类型" />
+                <el-table-column prop="name" label="字段名称"/>
+                <el-table-column prop="type" label="字段类型"/>
               </el-table>
             </el-col>
             <el-col :span="4">
               <el-table
-                :data="formData.line"
-                :cell-style="()=>{return 'text-align: center'}"
-                @cell-click="onProgressCellClick"
-                empty-text=" "
+                  :data="formData.line"
+                  :cell-style="()=>{return 'text-align: center'}"
+                  @cell-click="onProgressCellClick"
+                  empty-text=" "
               >
                 <el-table-column>
                   <template slot-scope="scope">
@@ -85,13 +85,13 @@
             </el-col>
             <el-col :span="10">
               <el-table
-                :data="formData.target_col"
-                id="target_col_tb"
-                :cell-style="()=>{return 'text-align: center'}"
-                :header-cell-style="()=>{return 'text-align: center'}"
+                  :data="formData.target_col"
+                  id="target_col_tb"
+                  :cell-style="()=>{return 'text-align: center'}"
+                  :header-cell-style="()=>{return 'text-align: center'}"
               >
-                <el-table-column prop="name" label="字段名称" style="height: 60px" />
-                <el-table-column prop="type" label="字段类型" />
+                <el-table-column prop="name" label="字段名称" style="height: 60px"/>
+                <el-table-column prop="type" label="字段类型"/>
               </el-table>
             </el-col>
           </el-row>
@@ -120,15 +120,15 @@
           <el-divider content-position="left">调度规则</el-divider>
           <el-form-item label="调度器">
             <el-select
-              v-model="formData.rule_id"
-              placeholder="请选择调度规则"
-              class="transport_edit_select"
+                v-model="formData.rule_id"
+                placeholder="请选择调度规则"
+                class="transport_edit_select"
             >
               <el-option
-                v-for="(item,index) in ruleList"
-                :key="index"
-                :label="item.name"
-                :value="item.id"
+                  v-for="(item,index) in ruleList"
+                  :key="index"
+                  :label="item.name"
+                  :value="item.id"
               ></el-option>
             </el-select>
           </el-form-item>
@@ -155,37 +155,37 @@ import Sortable from "sortablejs";
 
 export default {
   name: "AddOrEditTransport",
-  components: { MySqlWrite, MySqlRead },
+  components: {MySqlWrite, MySqlRead},
   created() {
     if (this.$route.query.id != null) {
       this.$dbApi.get(
-        "transport/find",
-        { id: this.$route.query.id },
-        (response) => {
-          let metadata = JSON.parse(response.data.data.metadata);
-          this.formData = metadata.formData;
-          this.onSourceSelectChange(this.formData.sourceDb);
-          this.onTargetSelectChange(this.formData.targetDb);
-          this.job = metadata.job;
-          this.$nextTick(() => {
-            this.$refs["sourceDetail"].formData = this.formData.reader;
-            this.$refs["sourceDetail"].reader = this.job.content.reader;
-            this.$refs["sourceDetail"].onSchemaChange(
-              this.formData.reader.schema
-            );
-            this.$refs["targetDetail"].formData = this.formData.writer;
-            this.$refs["targetDetail"].writer = this.job.content.writer;
-            this.$refs["targetDetail"].onSchemaChange(
-              this.formData.reader.schema
-            );
-          });
-        }
+          "transport/find",
+          {id: this.$route.query.id},
+          (response) => {
+            let metadata = JSON.parse(response.data.data.metadata);
+            this.formData = metadata.formData;
+            this.onSourceSelectChange(this.formData.sourceDb);
+            this.onTargetSelectChange(this.formData.targetDb);
+            this.job = metadata.job;
+            this.$nextTick(() => {
+              this.$refs["sourceDetail"].formData = this.formData.reader;
+              this.$refs["sourceDetail"].reader = this.job.content.reader;
+              this.$refs["sourceDetail"].onSchemaChange(
+                  this.formData.reader.schema
+              );
+              this.$refs["targetDetail"].formData = this.formData.writer;
+              this.$refs["targetDetail"].writer = this.job.content.writer;
+              this.$refs["targetDetail"].onSchemaChange(
+                  this.formData.reader.schema
+              );
+            });
+          }
       );
     }
-    this.$dbApi.get("db/listPage", { pageNum: -1 }, (response) => {
+    this.$dbApi.get("db/listPage", {pageNum: -1}, (response) => {
       this.dbList = response.data.data.list;
     });
-    this.$ruleApi.get("rule/listPage", { pageNum: -1 }, (response) => {
+    this.$ruleApi.get("rule/listPage", {pageNum: -1}, (response) => {
       for (let rule of response.data.data.list) {
         this.ruleList.push(rule);
       }
@@ -243,17 +243,17 @@ export default {
         const type = item.split("-")[0];
         const id = item.split("-")[1];
         this.$dbApi.post(
-          ["db", type, id, "catalog", "get"].join("/"),
-          {},
-          (response) => {
-            if (response.data.code === 200) {
-              this.$refs["sourceDetail"].formData.source_id = id;
-              this.$refs["sourceDetail"].selectData.catalog =
-                response.data.data;
-            } else {
-              this.$respHandler.handleResponse(response);
+            ["db", type, id, "catalog", "get"].join("/"),
+            {},
+            (response) => {
+              if (response.data.code === 200) {
+                this.$refs["sourceDetail"].formData.source_id = id;
+                this.$refs["sourceDetail"].selectData.catalog =
+                    response.data.data;
+              } else {
+                this.$respHandler.handleResponse(response);
+              }
             }
-          }
         );
       }
     },
@@ -262,17 +262,17 @@ export default {
         const type = item.split("-")[0];
         const id = item.split("-")[1];
         this.$dbApi.post(
-          ["db", type, id, "catalog", "get"].join("/"),
-          {},
-          (response) => {
-            if (response.data.code === 200) {
-              this.$refs["targetDetail"].formData.target_id = id;
-              this.$refs["targetDetail"].selectData.catalog =
-                response.data.data;
-            } else {
-              this.$respHandler.handleResponse(response);
+            ["db", type, id, "catalog", "get"].join("/"),
+            {},
+            (response) => {
+              if (response.data.code === 200) {
+                this.$refs["targetDetail"].formData.target_id = id;
+                this.$refs["targetDetail"].selectData.catalog =
+                    response.data.data;
+              } else {
+                this.$respHandler.handleResponse(response);
+              }
             }
-          }
         );
       }
     },
@@ -280,10 +280,10 @@ export default {
       const tbody = document.querySelector("#source_col_tb tbody");
       const _this = this;
       Sortable.create(tbody, {
-        onEnd({ newIndex, oldIndex }) {
+        onEnd({newIndex, oldIndex}) {
           const temp = _this.formData.source_col[newIndex];
           _this.formData.source_col[newIndex] =
-            _this.formData.source_col[oldIndex];
+              _this.formData.source_col[oldIndex];
           _this.formData.source_col[oldIndex] = temp;
         },
       });
@@ -292,10 +292,10 @@ export default {
       const tbody = document.querySelector("#target_col_tb tbody");
       const _this = this;
       Sortable.create(tbody, {
-        onEnd({ newIndex, oldIndex }) {
+        onEnd({newIndex, oldIndex}) {
           const temp = _this.formData.target_col[newIndex];
           _this.formData.target_col[newIndex] =
-            _this.formData.target_col[oldIndex];
+              _this.formData.target_col[oldIndex];
           _this.formData.target_col[oldIndex] = temp;
         },
       });
@@ -327,11 +327,11 @@ export default {
     connectCol() {
       this.formData.line = [];
       let minLineCount = Math.min(
-        this.formData.source_col.length,
-        this.formData.target_col.length
+          this.formData.source_col.length,
+          this.formData.target_col.length
       );
       for (let index = 0; index < minLineCount; index++) {
-        this.formData.line.push({ value: 100 });
+        this.formData.line.push({value: 100});
       }
     },
     onProgressCellClick(item) {
@@ -341,13 +341,13 @@ export default {
     onSave() {
       //合并读取的配置
       this.job.content.reader = Object.assign(
-        this.$refs["sourceDetail"].reader,
-        this.job.content.reader
+          this.$refs["sourceDetail"].reader,
+          this.job.content.reader
       );
       //合并写入的配置
       this.job.content.writer = Object.assign(
-        this.$refs["targetDetail"].writer,
-        this.job.content.writer
+          this.$refs["targetDetail"].writer,
+          this.job.content.writer
       );
       //构建列表信息
       this.job.content.reader.parameter.columns = [];
@@ -355,10 +355,10 @@ export default {
       for (let i = 0; i < this.formData.line.length; i++) {
         if (this.formData.line[i].value === 100) {
           this.job.content.reader.parameter.columns.push(
-            this.formData.source_col[i].name
+              this.formData.source_col[i].name
           );
           this.job.content.writer.parameter.columns.push(
-            this.formData.target_col[i].name
+              this.formData.target_col[i].name
           );
         }
       }
@@ -368,42 +368,42 @@ export default {
       //发送请求
       if (this.$route.query.id != null) {
         this.$dbApi.post(
-          "transport/modify",
-          {
-            id: this.$route.query.id,
-            name: this.formData.name,
-            source: this.formData.sourceDb,
-            target: this.formData.targetDb,
-            ruleId: this.formData.rule_id,
-            config: JSON.stringify(this.job),
-            metadata: JSON.stringify({
-              formData: this.formData,
-              job: this.job,
-            }),
-          },
-          (response) => {
-            this.$respHandler.handleResponse(response);
-            this.$router.push("/components/data/Transport");
-          }
+            "transport/modify",
+            {
+              id: this.$route.query.id,
+              name: this.formData.name,
+              source: this.formData.sourceDb,
+              target: this.formData.targetDb,
+              ruleId: this.formData.rule_id,
+              config: JSON.stringify(this.job),
+              metadata: JSON.stringify({
+                formData: this.formData,
+                job: this.job,
+              }),
+            },
+            (response) => {
+              this.$respHandler.handleResponse(response);
+              this.$router.push("/components/data/Transport");
+            }
         );
       } else {
         this.$dbApi.post(
-          "transport/add",
-          {
-            name: this.formData.name,
-            source: this.formData.sourceDb,
-            target: this.formData.targetDb,
-            ruleId: this.formData.rule_id,
-            config: JSON.stringify(this.job),
-            metadata: JSON.stringify({
-              formData: this.formData,
-              job: this.job,
-            }),
-          },
-          (response) => {
-            this.$respHandler.handleResponse(response);
-            this.$router.push("/components/data/Transport");
-          }
+            "transport/add",
+            {
+              name: this.formData.name,
+              source: this.formData.sourceDb,
+              target: this.formData.targetDb,
+              ruleId: this.formData.rule_id,
+              config: JSON.stringify(this.job),
+              metadata: JSON.stringify({
+                formData: this.formData,
+                job: this.job,
+              }),
+            },
+            (response) => {
+              this.$respHandler.handleResponse(response);
+              this.$router.push("/components/data/Transport");
+            }
         );
       }
     },

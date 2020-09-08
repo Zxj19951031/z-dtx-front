@@ -8,31 +8,31 @@ import AddOrEditTransport from "@/components/transport/AddOrEditTransport";
 Vue.use(Router);
 
 export default new Router({
-  routes: [
-    {
-      path: "/",
-      name: "home",
-      redirect: "/components/database/DatabaseManager",
-    },
-    {
-      path: "/components/database/DatabaseManager",
-      name: "DatabaseManager",
-      component: DatabaseManager,
-    },
-    {
-      path: "/components/rule/Rule",
-      name: "Rule",
-      component: Rule,
-    },
-    {
-      path: "/components/data/Transport",
-      name: "Transport",
-      component: Transport,
-    },
-    {
-      path: "/components/transport/AddOrEditTransport",
-      name: "AddOrEditTransport",
-      component: AddOrEditTransport,
-    },
-  ],
+    routes: [
+        {
+            path: "/",
+            name: "home",
+            redirect: "/components/database/DatabaseManager",
+        },
+        {
+            path: "/components/database/DatabaseManager",
+            name: "DatabaseManager",
+            component: DatabaseManager,
+        },
+        {
+            path: "/components/rule/Rule",
+            name: "Rule",
+            component: Rule,
+        },
+        {
+            path: "/components/data/Transport",
+            name: "Transport",
+            component: Transport,
+        },
+        {
+            path: "/components/transport/AddOrEditTransport",
+            name: "AddOrEditTransport",
+            component: AddOrEditTransport,
+        },
+    ],
 });

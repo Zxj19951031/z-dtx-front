@@ -2,40 +2,40 @@
   <el-form v-model="reader" label-width="160px">
     <el-form-item label="选择库">
       <el-select
-        v-model="formData.schema"
-        placeholder="请选择（Schema）"
-        @change="onSchemaChange"
-        class="transport_edit_select"
+          v-model="formData.schema"
+          placeholder="请选择（Schema）"
+          @change="onSchemaChange"
+          class="transport_edit_select"
       >
         <el-option
-          v-for="(item,index) in selectData.catalog"
-          :key="index"
-          :label="item"
-          :value="item"
+            v-for="(item,index) in selectData.catalog"
+            :key="index"
+            :label="item"
+            :value="item"
         ></el-option>
       </el-select>
     </el-form-item>
     <el-form-item>
       <el-switch
-        v-model="formData.ifQuery"
-        active-color="#13ce66"
-        inactive-color="#13ce66"
-        active-text="自定义"
-        inactive-text="选择表"
+          v-model="formData.ifQuery"
+          active-color="#13ce66"
+          inactive-color="#13ce66"
+          active-text="自定义"
+          inactive-text="选择表"
       ></el-switch>
     </el-form-item>
     <el-form-item label="选择表" v-if="!formData.ifQuery">
       <el-select
-        v-model="reader.parameter.table"
-        placeholder="请选择（Table）"
-        @change="onTableChange"
-        class="transport_edit_select"
+          v-model="reader.parameter.table"
+          placeholder="请选择（Table）"
+          @change="onTableChange"
+          class="transport_edit_select"
       >
         <el-option
-          v-for="(item,index) in selectData.table"
-          :key="index"
-          :label="item.split('.')[1]"
-          :value="item"
+            v-for="(item,index) in selectData.table"
+            :key="index"
+            :label="item.split('.')[1]"
+            :value="item"
         ></el-option>
       </el-select>
     </el-form-item>
@@ -107,36 +107,36 @@ export default {
     onSchemaChange(item) {
       if (item !== "") {
         this.$dbApi.post(
-          ["db", 1, this.formData.source_id, "table", "get"].join("/"),
-          { catalog: item },
-          (response) => {
-            if (response.data.code === 200) {
-              this.selectData.table = [];
-              for (let tb of response.data.data) {
-                this.selectData.table.push(this.formData.schema + "." + tb);
+            ["db", 1, this.formData.source_id, "table", "get"].join("/"),
+            {catalog: item},
+            (response) => {
+              if (response.data.code === 200) {
+                this.selectData.table = [];
+                for (let tb of response.data.data) {
+                  this.selectData.table.push(this.formData.schema + "." + tb);
+                }
+              } else {
+                this.$respHandler.handleResponse(response);
               }
-            } else {
-              this.$respHandler.handleResponse(response);
             }
-          }
         );
       }
     },
     onTableChange(item) {
       if (item !== "") {
         this.$dbApi.post(
-          ["db", 1, this.formData.source_id, "column", "get"].join("/"),
-          {
-            catalog: this.formData.schema,
-            table: this.reader.parameter.table,
-          },
-          (response) => {
-            if (response.data.code === 200) {
-              this.$emit("receiveChildren", response.data.data);
-            } else {
-              this.$respHandler.handleResponse(response);
+            ["db", 1, this.formData.source_id, "column", "get"].join("/"),
+            {
+              catalog: this.formData.schema,
+              table: this.reader.parameter.table,
+            },
+            (response) => {
+              if (response.data.code === 200) {
+                this.$emit("receiveChildren", response.data.data);
+              } else {
+                this.$respHandler.handleResponse(response);
+              }
             }
-          }
         );
       }
     },

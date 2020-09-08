@@ -20,10 +20,11 @@
     </el-row>
     <el-row>
       <el-table :data="tableData" style="width: 100%">
-        <el-table-column type="index" label="序号" width="50" />
-        <el-table-column prop="name" label="传输名称" width="300" />
-        <el-table-column prop="createTime" label="创建时间" />
-        <el-table-column prop="updateTime" label="修改时间" />
+        <el-table-column type="index" label="序号" width="50"/>
+        <el-table-column prop="name" label="传输名称" width="300"/>
+        <el-table-column prop="registeredDesc" label="任务状态" width="100"/>
+        <el-table-column prop="createTime" label="创建时间"/>
+        <el-table-column prop="updateTime" label="修改时间"/>
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button type="text" size="small" @click="onSetting(scope.row)">
@@ -32,8 +33,21 @@
             <el-button type="text" size="small">
               <i class="el-icon-tickets"></i>查看实例
             </el-button>
-            <el-button type="text" size="small" @click="onRegister(scope.row)">
+            <el-button
+                type="text"
+                size="small"
+                @click="onRegister(scope.row)"
+                v-if="scope.row.registered===0"
+            >
               <i class="el-icon-video-play"></i>运行
+            </el-button>
+            <el-button
+                type="text"
+                size="small"
+                @click="onCancel(scope.row)"
+                v-if="scope.row.registered===1"
+            >
+              <i class="el-icon-video-pause"></i>停止
             </el-button>
             <el-button type="text" size="small">
               <i class="el-icon-delete"></i>删除
@@ -43,12 +57,12 @@
       </el-table>
       <el-row type="flex" justify="center">
         <el-pagination
-          @size-change="onPageSizeChange"
-          @current-change="onPageNumChange"
-          :page-sizes="pageParam.pageSizes"
-          :page-size="pageParam.pageSize"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="pageParam.total"
+            @size-change="onPageSizeChange"
+            @current-change="onPageNumChange"
+            :page-sizes="pageParam.pageSizes"
+            :page-size="pageParam.pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="pageParam.total"
         ></el-pagination>
       </el-row>
     </el-row>
@@ -79,12 +93,12 @@ export default {
   methods: {
     flushTable(params) {
       this.$dbApi.get(
-        "transport/page/list",
-        params == null ? {} : params,
-        (response) => {
-          this.tableData = response.data.data.list;
-          this.pageParam.total = response.data.data.total;
-        }
+          "transport/page/list",
+          params == null ? {} : params,
+          (response) => {
+            this.tableData = response.data.data.list;
+            this.pageParam.total = response.data.data.total;
+          }
       );
     },
     onSearchFormClear(ref) {
@@ -105,12 +119,19 @@ export default {
     onSetting(row) {
       this.$router.push({
         name: "AddOrEditTransport",
-        query: { id: row.id },
+        query: {id: row.id},
       });
     },
     onRegister(row) {
-      this.$dbApi.get("transport/register", { id: row.id }, (response) => {
+      this.$dbApi.get("transport/register", {id: row.id}, (response) => {
         this.$respHandler.handleResponse(response);
+        this.flushTable(this.formSearch);
+      });
+    },
+    onCancel(row) {
+      this.$dbApi.get("transport/cancel", {id: row.id}, (response) => {
+        this.$respHandler.handleResponse(response);
+        this.flushTable(this.formSearch);
       });
     },
   },

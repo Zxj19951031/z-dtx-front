@@ -1,13 +1,13 @@
 <template>
-    <el-container>
-        footer
-    </el-container>
+  <el-container>
+    footer
+  </el-container>
 </template>
 
 <script>
-    export default {
-        name: "Footer.vue"
-    }
+export default {
+  name: "Footer.vue"
+}
 </script>
 
 <style scoped>

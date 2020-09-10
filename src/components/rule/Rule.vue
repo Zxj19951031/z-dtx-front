@@ -1,5 +1,7 @@
+<!--规则管理页-->
 <template>
   <div>
+    <!--    搜索行-->
     <el-row>
       <el-col :span="16">
         <el-form :inline="true" :model="formSearch" class="demo-form-inline" ref="formSearch">
@@ -18,13 +20,14 @@
         <el-button type="primary" icon="el-icon-plus" @click="handleDrawerOpen(null)">新增</el-button>
       </el-col>
     </el-row>
+    <!--    记录行-->
     <el-row>
       <el-table :data="tableData" style="width: 100%">
         <el-table-column type="index" label="序号" width="50"/>
-        <el-table-column prop="name" label="规则名称" width="300"/>
+        <el-table-column prop="name" label="规则名称" width="350"/>
         <el-table-column prop="expression" label="规则表达式" width="180"/>
-        <el-table-column prop="createTime" label="创建时间"/>
-        <el-table-column prop="updateTime" label="修改时间"/>
+        <el-table-column prop="createTime" label="创建时间" width="300"/>
+        <el-table-column prop="updateTime" label="修改时间" width="300"/>
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button type="text" size="small" @click="handleDrawerOpen(scope.row)">
@@ -47,10 +50,12 @@
         ></el-pagination>
       </el-row>
     </el-row>
+    <!--    抽屉页-->
     <el-drawer
         :visible.sync="drawer.visible"
         :direction="drawer.direction"
         :before-close="beforeDrawerClose"
+        :with-header="false"
         @closed="handleDrawerClose('drawerForm')"
         :modal="drawer.model"
         ref="drawer"
@@ -60,7 +65,7 @@
         <el-main>
           <el-form
               :model="formAddOrEdit"
-              label-width="140px"
+              label-width="120px"
               style="margin-right: 20px"
               ref="drawerForm"
           >
@@ -522,7 +527,7 @@
             <el-form-item label="规则表达式" prop="expression">
               <el-input v-model="formAddOrEdit.expression" :readonly="true"></el-input>
             </el-form-item>
-            <el-form-item label="近十次运行时间演示">
+            <el-form-item label="近十次运行时间">
               <el-row type="flex" justify="space-between">
                 <el-col :span="18">
                   <el-input
@@ -857,15 +862,15 @@ export default {
       this.onSearchFormClear(ref);
     },
     handleDrawerAddOrEdit() {
-      let url = "";
       if (this.drawer.type === "add") {
-        url = "rule/add";
+        this.$ruleApi.post("rule/add", this.formAddOrEdit, (response) => {
+          this.$respHandler.handleResponse(response, "新增成功");
+        });
       } else {
-        url = "rule/modify";
+        this.$ruleApi.post("rule/modify", this.formAddOrEdit, (response) => {
+          this.$respHandler.handleResponse(response, "编辑成功");
+        });
       }
-      this.$ruleApi.post(url, this.formAddOrEdit, (response) => {
-        this.$respHandler.handleResponse(response);
-      });
       this.$refs.drawer.closeDrawer();
     },
     onExpressionChange() {

@@ -1,5 +1,7 @@
+<!--数据源管理-->
 <template>
   <div>
+    <!--搜索行-->
     <el-row>
       <el-col :span="16">
         <el-form :inline="true" :model="formSearch" class="demo-form-inline" ref="formSearch">
@@ -20,7 +22,7 @@
             <el-button type="primary" @click="flushTable(formSearch)" icon="el-icon-search">查询</el-button>
           </el-form-item>
           <el-form-item>
-            <el-button @click="onSearchFormClear('formSearch')">清空</el-button>
+            <el-button @click="onSearchFormClear()">清空</el-button>
           </el-form-item>
         </el-form>
       </el-col>
@@ -28,12 +30,13 @@
         <el-button type="primary" @click="handleDrawerOpen(null)" icon="el-icon-plus">新增</el-button>
       </el-col>
     </el-row>
+    <!--记录行-->
     <el-row>
       <el-table :data="tableData" style="width: 100%">
         <el-table-column type="index" label="序号" width="50"/>
-        <el-table-column prop="dbName" label="数据源名称" width="300"/>
+        <el-table-column prop="dbName" label="数据源名称" width="350"/>
         <el-table-column prop="dbTypeStr" label="数据源类型" width="180"/>
-        <el-table-column prop="host" label="主机地址"/>
+        <el-table-column prop="host" label="主机地址" width="300"/>
         <el-table-column prop="createTime" label="创建时间"/>
         <el-table-column prop="updateTime" label="修改时间"/>
         <el-table-column label="操作">
@@ -58,11 +61,10 @@
         ></el-pagination>
       </el-row>
     </el-row>
+    <!--抽屉页-->
     <el-drawer
         :visible.sync="drawer.visible"
         :direction="drawer.direction"
-        :before-close="beforeDrawerClose"
-        @closed="handleDrawerClose('drawerForm')"
         :modal="drawer.model"
         ref="drawer"
     >
@@ -153,9 +155,7 @@ export default {
   name: "DatabaseManager",
   methods: {
     flushTable(params) {
-      this.$dbApi.get(
-          "db/listPage",
-          params == null ? {} : params,
+      this.$dbApi.get("db/listPage", params == null ? {} : params,
           (response) => {
             this.tableData = response.data.data.list;
             this.pageParam.total = response.data.data.total;
@@ -170,37 +170,32 @@ export default {
       this.formSearch.pageNum = pageNum;
       this.flushTable(this.formSearch);
     },
-    onSearchFormClear(ref) {
-      this.$refs[ref].resetFields();
+    onSearchFormClear() {
+      this.$refs['formSearch'].resetFields();
       this.flushTable(this.formSearch);
     },
-    beforeDrawerClose(done) {
-      done();
-    },
     handleDrawerAddOrEdit() {
-      this.formAddOrEdit = Object.assign(
-          this.$refs[this.dbType[this.formAddOrEdit.dbType - 1].label].form,
-          this.formAddOrEdit
-      );
       let url = "";
       if (this.drawer.type === "add") {
         url = "db/addOne";
       } else {
         url = "db/modify";
       }
-      this.$dbApi.post(url, this.formAddOrEdit, (response) => {
-        this.$respHandler.handleResponse(response);
-        this.$refs.drawer.closeDrawer();
-      });
+      this.$dbApi.post(url,
+          Object.assign(this.$refs[this.dbType[this.formAddOrEdit.dbType - 1].label].form, this.formAddOrEdit),
+          (response) => {
+            this.$respHandler.handleResponse(response);
+            this.$refs.drawer.closeDrawer();
+            this.onSearchFormClear();
+          });
     },
-    handleDrawerClose(ref) {
-      this.$refs[this.dbType[this.formAddOrEdit.dbType - 1].label].restForm();
-      this.onSearchFormClear(ref);
-    },
+    //抽屉打开
     handleDrawerOpen(row) {
       this.drawer.visible = true;
       if (row == null) {
         this.drawer.type = "add";
+        this.$refs.drawerForm.resetFields();
+        this.$refs[this.dbType[this.formAddOrEdit.dbType - 1].label].restForm();
       } else {
         this.drawer.type = "edit";
         this.$dbApi.get(
@@ -216,30 +211,21 @@ export default {
       }
     },
     handleRowDelete(row) {
-      let params = {
-        rows: [
-          {
-            type: row.dbType,
-            id: row.id,
-          },
-        ],
-      };
-      this.$dbApi.post("db/deleteBatch", params, (response) => {
-        this.$respHandler.handleResponse(response);
-        this.flushTable(this.formSearch);
-      });
+      this.$dbApi.post(
+          "db/deleteBatch",
+          {rows: [{type: row.dbType, id: row.id,}]},
+          (response) => {
+            this.$respHandler.handleResponse(response);
+            this.flushTable(this.formSearch);
+          });
     },
     checkConnection() {
-      this.formAddOrEdit = Object.assign(
-          this.$refs[this.dbType[this.formAddOrEdit.dbType - 1].label].form,
-          this.formAddOrEdit
-      );
       this.loading = true;
       this.$dbApi.post(
           "db/connection/check",
-          this.formAddOrEdit,
+          Object.assign(this.$refs[this.dbType[this.formAddOrEdit.dbType - 1].label].form, this.formAddOrEdit),
           (response) => {
-            this.$respHandler.handleResponse(response);
+            this.$respHandler.handleResponse(response, 'success');
             this.loading = false;
           }
       );

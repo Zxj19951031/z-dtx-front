@@ -35,7 +35,19 @@
       <el-table :data="tableData" style="width: 100%">
         <el-table-column type="index" label="序号" width="50"/>
         <el-table-column prop="dbName" label="数据源名称" width="350"/>
-        <el-table-column prop="dbTypeStr" label="数据源类型" width="180"/>
+        <el-table-column prop="dbTypeStr" label="数据源类型" width="180">
+          <template slot-scope="scope">
+            <img class="database-icon" v-if="scope.row.dbTypeStr==='MySql'" src="../../assets/mysql.png" height="16"
+                 width="16"/>
+            <img class="database-icon" v-if="scope.row.dbTypeStr==='Oracle'" src="../../assets/oracle.png" height="16"
+                 width="16"/>
+            <img class="database-icon" v-if="scope.row.dbTypeStr==='SqlServer'" src="../../assets/sqlserver.png"
+                 height="16" width="16"/>
+            <span>
+              {{ scope.row.dbTypeStr }}
+            </span>
+          </template>
+        </el-table-column>
         <el-table-column prop="host" label="主机地址" width="300"/>
         <el-table-column prop="createTime" label="创建时间"/>
         <el-table-column prop="updateTime" label="修改时间"/>
@@ -90,6 +102,8 @@
               </el-select>
             </el-form-item>
             <MySqlForm v-if="formAddOrEdit.dbType===1" :ref="dbType[formAddOrEdit.dbType-1].label"></MySqlForm>
+            <OracleForm v-if="formAddOrEdit.dbType===2" :ref="dbType[formAddOrEdit.dbType-1].label"></OracleForm>
+            <SqlServerFrom v-if="formAddOrEdit.dbType===3" :ref="dbType[formAddOrEdit.dbType-1].label"></SqlServerFrom>
           </el-form>
         </el-main>
         <el-footer style="text-align: right; padding-top: 10px" justify="center">
@@ -108,9 +122,11 @@
 
 <script>
 import MySqlForm from "@/components/database/form/MySqlForm";
+import OracleForm from "@/components/database/form/OracleForm";
+import SqlServerFrom from "@/components/database/form/SqlServerFrom";
 
 export default {
-  components: {MySqlForm},
+  components: {MySqlForm, OracleForm, SqlServerFrom},
   created() {
     this.flushTable(this.formSearch);
   },
@@ -120,11 +136,16 @@ export default {
         {
           label: "MySql",
           value: 1,
+          icon: "../../assets/mysql.png"
         },
         {
           label: "Oracle",
           value: 2,
         },
+        {
+          label: "Sql Server",
+          value: 3
+        }
       ],
       drawer: {
         visible: false,
@@ -175,19 +196,24 @@ export default {
       this.flushTable(this.formSearch);
     },
     handleDrawerAddOrEdit() {
-      let url = "";
       if (this.drawer.type === "add") {
-        url = "db/addOne";
+        this.$dbApi.post("db/addOne",
+            Object.assign(this.$refs[this.dbType[this.formAddOrEdit.dbType - 1].label].form, this.formAddOrEdit),
+            (response) => {
+              this.$respHandler.handleResponse(response, "新增成功");
+              this.$refs.drawer.closeDrawer();
+              this.onSearchFormClear();
+            });
       } else {
-        url = "db/modify";
+        this.$dbApi.post("db/modify",
+            Object.assign(this.$refs[this.dbType[this.formAddOrEdit.dbType - 1].label].form, this.formAddOrEdit),
+            (response) => {
+              this.$respHandler.handleResponse(response, "编辑成功");
+              this.$refs.drawer.closeDrawer();
+              this.onSearchFormClear();
+            });
       }
-      this.$dbApi.post(url,
-          Object.assign(this.$refs[this.dbType[this.formAddOrEdit.dbType - 1].label].form, this.formAddOrEdit),
-          (response) => {
-            this.$respHandler.handleResponse(response);
-            this.$refs.drawer.closeDrawer();
-            this.onSearchFormClear();
-          });
+
     },
     //抽屉打开
     handleDrawerOpen(row) {
@@ -197,15 +223,14 @@ export default {
         this.$refs.drawerForm.resetFields();
         this.$refs[this.dbType[this.formAddOrEdit.dbType - 1].label].restForm();
       } else {
+        this.formAddOrEdit.dbType = row.dbType;
         this.drawer.type = "edit";
         this.$dbApi.get(
             "db/find",
             {id: row.id, dbType: row.dbType},
             (response) => {
               this.formAddOrEdit.dbName = response.data.data.dbName;
-              this.formAddOrEdit.dbType = row.dbType;
-              this.$refs[this.dbType[this.formAddOrEdit.dbType - 1].label].form =
-                  response.data.data;
+              this.$refs[this.dbType[row.dbType - 1].label].form = response.data.data;
             }
         );
       }

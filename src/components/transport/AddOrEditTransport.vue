@@ -2,12 +2,14 @@
   <div>
     <el-form v-model="job" label-width="160px" label-position="left" pre="job">
       <el-timeline style="padding-inline-start:0">
+        <!--        基本信息-->
         <el-timeline-item>
           <el-divider content-position="left">基本信息</el-divider>
           <el-form-item label="传输名称" prop="name">
             <el-input type="text" placeholder="请输入" v-model="formData.name"></el-input>
           </el-form-item>
         </el-timeline-item>
+        <!--        源头配置-->
         <el-timeline-item>
           <el-divider content-position="left">源头表</el-divider>
           <el-form-item label="数据源">
@@ -29,9 +31,13 @@
           <MySqlRead
               v-if="formData.sourceDb.split('-')[0]==='1'"
               ref="sourceDetail"
-              @receiveChildren="receiveSourceCol"
-          ></MySqlRead>
+              @receiveChildren="receiveSourceCol"></MySqlRead>
+          <OracleRead
+              v-if="formData.sourceDb.split('-')[0]==='2'"
+              ref="sourceDetail"
+              @receiveChildren="receiveSourceCol"></OracleRead>
         </el-timeline-item>
+        <!--        目标配置-->
         <el-timeline-item>
           <el-divider content-position="left">目标表</el-divider>
           <el-form-item label="数据源">
@@ -54,7 +60,13 @@
               ref="targetDetail"
               @receiveChildren="receiveTargetCol"
           ></MySqlWrite>
+          <OracleWrite
+              v-if="formData.targetDb.split('-')[0]==='2'"
+              ref="targetDetail"
+              @receiveChildren="receiveTargetCol"
+          ></OracleWrite>
         </el-timeline-item>
+        <!--        列配置-->
         <el-timeline-item>
           <el-divider content-position="left">列映射</el-divider>
           <el-row>
@@ -96,6 +108,7 @@
             </el-col>
           </el-row>
         </el-timeline-item>
+        <!--        全局配置-->
         <el-timeline-item>
           <el-divider content-position="left">高级配置</el-divider>
           <el-row>
@@ -116,6 +129,7 @@
             </el-col>
           </el-row>
         </el-timeline-item>
+        <!--        调度规则-->
         <el-timeline-item>
           <el-divider content-position="left">调度规则</el-divider>
           <el-form-item label="调度器">
@@ -133,6 +147,7 @@
             </el-select>
           </el-form-item>
         </el-timeline-item>
+        <!--        操作行-->
         <el-timeline-item>
           <el-divider content-position="left">完 成</el-divider>
           <el-row style="text-align: right;">
@@ -151,11 +166,13 @@
 <script>
 import MySqlRead from "@/components/transport/form/MySqlRead";
 import MySqlWrite from "@/components/transport/form/MySqlWrite";
+import OracleRead from "@/components/transport/form/OracleRead";
+import OracleWrite from "@/components/transport/form/OracleWrite";
 import Sortable from "sortablejs";
 
 export default {
   name: "AddOrEditTransport",
-  components: {MySqlWrite, MySqlRead},
+  components: {MySqlWrite, MySqlRead, OracleWrite, OracleRead},
   created() {
     if (this.$route.query.id != null) {
       this.$dbApi.get(
@@ -304,8 +321,8 @@ export default {
       let cols = [];
       for (let col of data) {
         let t = {
-          name: col.match(/^(\w+)\[(\w+)]/)[1],
-          type: col.match(/^(\w+)\[(\w+)]/)[2],
+          name: col.match(/^(.*)\[(.*)]/)[1],
+          type: col.match(/^(.*)\[(.*)]/)[2],
         };
         cols.push(t);
       }
@@ -316,8 +333,8 @@ export default {
       let cols = [];
       for (let col of data) {
         let t = {
-          name: col.match(/^(\w+)\[(\w+)]/)[1],
-          type: col.match(/^(\w+)\[(\w+)]/)[2],
+          name: col.match(/^(.*)\[(.*)]/)[1],
+          type: col.match(/^(.*)\[(.*)]/)[2],
         };
         cols.push(t);
       }
